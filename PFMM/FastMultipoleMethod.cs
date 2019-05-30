@@ -23,12 +23,14 @@ namespace PFMM
                 new List<Quadrant>()
             };
 
-            AssignListQuadrants(quadrantsOfLevels[0], QuadrantDivider.DivideQuadrant(wholeQuadrant, Level));
+            AssignListQuadrants(currentLevelOfQuadrants, QuadrantDivider.DivideQuadrant(wholeQuadrant, Level));
+            AssignListQuadrants(quadrantsOfLevels[Level - 1], currentLevelOfQuadrants);
             while (MaxPointCountInQuadrant(currentLevelOfQuadrants) > CustomConstrants.MaxPointCountInQuad)
             {
                 Level++;
                 quadrantsOfLevels.Add(new List<Quadrant>());
-                AssignListQuadrants(quadrantsOfLevels[Level - 1], NextLevel(currentLevelOfQuadrants));
+                AssignListQuadrants(currentLevelOfQuadrants, NextLevel(currentLevelOfQuadrants));
+                AssignListQuadrants(quadrantsOfLevels[Level - 1], currentLevelOfQuadrants);
             }
 
             MultipleLevelsInteraction(quadrantsOfLevels);
@@ -58,12 +60,14 @@ namespace PFMM
                 new List<Quadrant>()
             };
 
-            AssignListQuadrants(quadrantsOfLevels[0], QuadrantDivider.DivideQuadrant(wholeQuadrant, Level));
+            AssignListQuadrants(currentLevelOfQuadrants, QuadrantDivider.DivideQuadrant(wholeQuadrant, Level));
+            AssignListQuadrants(quadrantsOfLevels[Level - 1], currentLevelOfQuadrants);
             while (MaxPointCountInQuadrant(currentLevelOfQuadrants) > CustomConstrants.MaxPointCountInQuad)
             {
                 Level++;
                 quadrantsOfLevels.Add(new List<Quadrant>());
-                AssignListQuadrants(quadrantsOfLevels[Level - 1], NextLevel(currentLevelOfQuadrants));
+                AssignListQuadrants(currentLevelOfQuadrants, NextLevel(currentLevelOfQuadrants));
+                AssignListQuadrants(quadrantsOfLevels[Level - 1], currentLevelOfQuadrants);
             }
 
             SingleLevelInteraction(quadrantsOfLevels);
@@ -377,9 +381,9 @@ namespace PFMM
                                                Math.Pow(p1.Y - p2.Y, 2)));
         }
 
-        public void InitializeListQuadrants(List<Quadrant> qAdd, List<Quadrant> qBig)
+        public void InitializeListQuadrants(List<Quadrant> partOfQuadrants, List<Quadrant> quadrants)
         {
-            qBig.InsertRange(qBig.Count, qAdd);
+            quadrants.InsertRange(quadrants.Count, partOfQuadrants);
         }
 
         public void AssignQuadrant(Quadrant assignTo, Quadrant assignFrom)
