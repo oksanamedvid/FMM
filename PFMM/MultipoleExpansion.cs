@@ -12,35 +12,16 @@ namespace PFMM
             return Math.Sqrt(Math.Pow((x.X - y.X), 2) + Math.Pow((x.Y - y.Y), 2));
         }
 
-        private ulong bcl(int n, int k)
+        public static double Factorial(int number)
         {
-            if (k > n / 2) k = n - k;
-            switch (k)
-            {
-                case 1:
-                    return (ulong)n;
-                case 0:
-                    return 1;
-            }
+            if (number == 1 || number == 0)
+                return 1;
+            return number * Factorial(number - 1);
+        }
 
-            ulong r;
-            if (n + k >= 90)
-            {
-                // разрядности может не хватить, используем рекурсию
-                r = bcl(n - 1, k);
-                r += +bcl(n - 1, k - 1);
-            }
-            else
-            {
-                r = 1;
-                for (int i = 1; i <= k; ++i)
-                {
-                    r *= (ulong)(n - k + i);
-                    r /= (ulong)i;
-                }
-            }
-
-            return r;
+        private double Bcl(int n, int k)
+        {
+            return Factorial(n) / (Factorial(k) * Factorial(n - k));
         }
 
         public Matrix<double> T_ofs(List<Point> points, Point c)
@@ -86,7 +67,7 @@ namespace PFMM
                     }
                     else
                     {
-                        tIfo[i, j] = Math.Pow(-1, j) * bcl(i + j - 1, j - 1) *
+                        tIfo[i, j] = Math.Pow(-1, j) * Bcl(i + j - 1, j - 1) *
                                      (1.0 / Math.Pow(Distance(c1, c2), i + j));
                     }
                 }
@@ -123,7 +104,7 @@ namespace PFMM
                     tOfo[i, 0] = -(1.0 / i) * Math.Pow(Distance(c1, c2), i);
                     for (var j = 1; j <= i; j++)
                     {
-                        tOfo[i, j] = bcl(i - 1, j - 1) * Math.Pow(Distance(c1, c2), i - j);
+                        tOfo[i, j] = Bcl(i - 1, j - 1) * Math.Pow(Distance(c1, c2), i - j);
                     }
                 }
             }
@@ -138,7 +119,7 @@ namespace PFMM
             {
                 for (var j = i; j < CustomConstrants.ErrorP; j++)
                 {
-                    tIfi[i, j] = bcl(j, i) * Math.Pow(Distance(c1, c2), j - i);
+                    tIfi[i, j] = Bcl(j, i) * Math.Pow(Distance(c1, c2), j - i);
                 }
             }
 

@@ -40,9 +40,7 @@ namespace PFMM
             {
                 for (var j = 0; j < quad.Points.Count; j++)
                 {
-
                     dictionary.Add(quad.Points[j], quad.Interaction[j]);
-
                 }
             }
 
@@ -168,9 +166,9 @@ namespace PFMM
                     AssignListQuadrants(parentNearField, QuadrantDivider.NearField(quadrantsOfLevels[i][j].Parent, temp, i));
 
                     childrenOfParentNeighbors.Clear();
-                    for (int k = 0; k < parentNearField.Count; k++)
+                    foreach (var nearFild in parentNearField)
                     {
-                        childrenOfParentNeighbors.AddRange(GetChildren(parentNearField[k], quadrantsOfLevels[i]));
+                        childrenOfParentNeighbors.AddRange(GetChildren(nearFild, quadrantsOfLevels[i]));
                     }
 
                     AssignListQuadrants(interactionList,
