@@ -26,8 +26,8 @@ namespace PFMM
 
         public Matrix<double> T_ofs(List<Point> points, Point c)
         {
-            var tOfs = new double[CustomConstrants.ErrorP, points.Count];
-            for (var i = 0; i < CustomConstrants.ErrorP; i++)
+            var tOfs = new double[CustomConstants.ErrorP, points.Count];
+            for (var i = 0; i < CustomConstants.ErrorP; i++)
             {
                 for (var j = 0; j < points.Count; j++)
                 {
@@ -47,8 +47,8 @@ namespace PFMM
 
         public Matrix<double> T_ifo(Point c1, Point c2)
         {
-            var tIfo = new double[CustomConstrants.ErrorP, CustomConstrants.ErrorP];
-            for (var i = 0; i < CustomConstrants.ErrorP; i++)
+            var tIfo = new double[CustomConstants.ErrorP, CustomConstants.ErrorP];
+            for (var i = 0; i < CustomConstants.ErrorP; i++)
             {
                 if (i == 0)
                 {
@@ -59,7 +59,7 @@ namespace PFMM
                     tIfo[i, 0] = -1.0 / (i * Math.Pow(Distance(c1, c2), i));
                 }
 
-                for (var j = 1; j < CustomConstrants.ErrorP; j++)
+                for (var j = 1; j < CustomConstants.ErrorP; j++)
                 {
                     if (i == 0)
                     {
@@ -78,10 +78,10 @@ namespace PFMM
 
         public Matrix<double> T_tfi(List<Point> points, Point c)
         {
-            var tIfi = new double[points.Count, CustomConstrants.ErrorP];
+            var tIfi = new double[points.Count, CustomConstants.ErrorP];
             for (var i = 0; i < points.Count; i++)
             {
-                for (var j = 0; j < CustomConstrants.ErrorP; j++)
+                for (var j = 0; j < CustomConstants.ErrorP; j++)
                 {
                     tIfi[i, j] = Math.Pow(Distance(points[i], c), j);
                 }
@@ -92,8 +92,8 @@ namespace PFMM
 
         public Matrix<double> T_ofo(Point c1, Point c2)
         {
-            var tOfo = new double[CustomConstrants.ErrorP, CustomConstrants.ErrorP];
-            for (var i = 0; i < CustomConstrants.ErrorP; i++)
+            var tOfo = new double[CustomConstants.ErrorP, CustomConstants.ErrorP];
+            for (var i = 0; i < CustomConstants.ErrorP; i++)
             {
                 if (i == 0)
                 {
@@ -114,10 +114,10 @@ namespace PFMM
 
         public Matrix<double> T_ifi(Point c1, Point c2)
         {
-            var tIfi = new double[CustomConstrants.ErrorP, CustomConstrants.ErrorP];
-            for (var i = 0; i < CustomConstrants.ErrorP; i++)
+            var tIfi = new double[CustomConstants.ErrorP, CustomConstants.ErrorP];
+            for (var i = 0; i < CustomConstants.ErrorP; i++)
             {
-                for (var j = i; j < CustomConstrants.ErrorP; j++)
+                for (var j = i; j < CustomConstants.ErrorP; j++)
                 {
                     tIfi[i, j] = Bcl(j, i) * Math.Pow(Distance(c1, c2), j - i);
                 }

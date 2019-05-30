@@ -45,7 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CustomConstrants.cs" />
+    <Compile Include="CustomConstants.cs" />
     <Compile Include="FastMultipoleMethod.cs" />
     <Compile Include="MultipoleExpansion.cs" />
     <Compile Include="Point.cs" />

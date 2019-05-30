@@ -25,7 +25,7 @@ namespace PFMM
 
             AssignListQuadrants(currentLevelOfQuadrants, QuadrantDivider.DivideQuadrant(wholeQuadrant, Level));
             AssignListQuadrants(quadrantsOfLevels[Level - 1], currentLevelOfQuadrants);
-            while (MaxPointCountInQuadrant(currentLevelOfQuadrants) > CustomConstrants.MaxPointCountInQuad)
+            while (MaxPointCountInQuadrant(currentLevelOfQuadrants) > CustomConstants.MaxPointCountInQuad)
             {
                 Level++;
                 quadrantsOfLevels.Add(new List<Quadrant>());
@@ -60,7 +60,7 @@ namespace PFMM
 
             AssignListQuadrants(currentLevelOfQuadrants, QuadrantDivider.DivideQuadrant(wholeQuadrant, Level));
             AssignListQuadrants(quadrantsOfLevels[Level - 1], currentLevelOfQuadrants);
-            while (MaxPointCountInQuadrant(currentLevelOfQuadrants) > CustomConstrants.MaxPointCountInQuad)
+            while (MaxPointCountInQuadrant(currentLevelOfQuadrants) > CustomConstants.MaxPointCountInQuad)
             {
                 Level++;
                 quadrantsOfLevels.Add(new List<Quadrant>());
@@ -90,7 +90,7 @@ namespace PFMM
             var watch = System.Diagnostics.Stopwatch.StartNew();
             for (var i = 0; i < quadrantsOfLevels[Level - 1].Count; ++i)
             {
-                quadrantsOfLevels[Level - 1][i].OutgoingExpansions = DenseVector.OfArray(new double[CustomConstrants.ErrorP]);
+                quadrantsOfLevels[Level - 1][i].OutgoingExpansions = DenseVector.OfArray(new double[CustomConstants.ErrorP]);
                 if (quadrantsOfLevels[Level - 1][i].Points == null || !quadrantsOfLevels[Level - 1][i].Points.Any())
                 {
                     continue;
@@ -114,7 +114,7 @@ namespace PFMM
             {
                 for (var j = 0; j < quadrantsOfLevels[i].Count; ++j)
                 {
-                    quadrantsOfLevels[i][j].OutgoingExpansions = DenseVector.OfArray(new double[CustomConstrants.ErrorP]);
+                    quadrantsOfLevels[i][j].OutgoingExpansions = DenseVector.OfArray(new double[CustomConstants.ErrorP]);
 
                     if (quadrantsOfLevels[i][j].Points == null || !quadrantsOfLevels[i][j].Points.Any())
                     {
@@ -148,14 +148,14 @@ namespace PFMM
 
             for (var j = 0; j < quadrantsOfLevels[0].Count; ++j)
             {
-                quadrantsOfLevels[0][j].IncomingExpansions = DenseVector.OfArray(new double[CustomConstrants.ErrorP]);
+                quadrantsOfLevels[0][j].IncomingExpansions = DenseVector.OfArray(new double[CustomConstants.ErrorP]);
             }
 
             for (var i = 1; i < Level; i++)
             {
                 for (var j = 0; j < quadrantsOfLevels[i].Count; ++j)
                 {
-                    quadrantsOfLevels[i][j].IncomingExpansions = DenseVector.OfArray(new double[CustomConstrants.ErrorP]);
+                    quadrantsOfLevels[i][j].IncomingExpansions = DenseVector.OfArray(new double[CustomConstants.ErrorP]);
 
                     if (quadrantsOfLevels[i][j].Points == null || !quadrantsOfLevels[i][j].Points.Any())
                     {
@@ -283,7 +283,7 @@ namespace PFMM
                 AssignListQuadrants(temp, quadrantsOfLevels[Level - 1]);
                 AssignListQuadrants(interactionList, QuadrantDivider.FarField(quadrantsOfLevels[Level - 1][j], temp, Level));
 
-                quadrantsOfLevels[Level - 1][j].IncomingExpansions = DenseVector.OfArray(new double[CustomConstrants.ErrorP]);
+                quadrantsOfLevels[Level - 1][j].IncomingExpansions = DenseVector.OfArray(new double[CustomConstants.ErrorP]);
                 foreach (var quad in interactionList)
                 {
                     if (quad.Points == null || !quad.Points.Any())
