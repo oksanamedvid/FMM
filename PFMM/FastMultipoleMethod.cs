@@ -52,7 +52,6 @@ namespace PFMM
             Level = 1;
             var wholeQuadrant = new Quadrant(points);
             var currentLevelOfQuadrants = new List<Quadrant>();
-
             var quadrantsOfLevels = new List<List<Quadrant>>
             {
                 new List<Quadrant>()
@@ -60,6 +59,7 @@ namespace PFMM
 
             AssignListQuadrants(currentLevelOfQuadrants, QuadrantDivider.DivideQuadrant(wholeQuadrant, Level));
             AssignListQuadrants(quadrantsOfLevels[Level - 1], currentLevelOfQuadrants);
+
             while (MaxPointCountInQuadrant(currentLevelOfQuadrants) > CustomConstants.MaxPointCountInQuad)
             {
                 Level++;
@@ -75,9 +75,7 @@ namespace PFMM
             {
                 for (var j = 0; j < quad.Points.Count; j++)
                 {
-
                     dictionary.Add(quad.Points[j], quad.Interaction[j]);
-
                 }
             }
 
@@ -88,44 +86,37 @@ namespace PFMM
         {
             var multEx = new MultipoleExpansion();
             var watch = System.Diagnostics.Stopwatch.StartNew();
-            for (var i = 0; i < quadrantsOfLevels[Level - 1].Count; ++i)
+            for (var i = 0; i < quadrantsOfLevels[Level - 1].Count; i++)
             {
-                quadrantsOfLevels[Level - 1][i].OutgoingExpansions = DenseVector.OfArray(new double[CustomConstants.ErrorP]);
-                if (quadrantsOfLevels[Level - 1][i].Points == null || !quadrantsOfLevels[Level - 1][i].Points.Any())
+                if (quadrantsOfLevels[Level - 1][i]?.Points.Any() != true)
                 {
                     continue;
                 }
 
                 var weight = new List<double>();
                 quadrantsOfLevels[Level - 1][i].Points.ForEach(p => { weight.Add(p.AdditionalValue); });
-
-                quadrantsOfLevels[Level - 1][i].OutgoingExpansions
-                    = MultiplyMatrixOnVector(multEx.T_ofs(quadrantsOfLevels[Level - 1][i].Points,
+                quadrantsOfLevels[Level - 1][i].OutgoingExpansions = MultiplyMatrixOnVector(multEx.T_ofs(quadrantsOfLevels[Level - 1][i].Points,
                         quadrantsOfLevels[Level - 1][i].CentreQuadrant()), DenseVector.OfArray(weight.ToArray()));
             }
-
             Console.WriteLine(watch.ElapsedMilliseconds);
             watch.Stop();
             watch = System.Diagnostics.Stopwatch.StartNew();
 
             var child = new List<Quadrant>();
-
             for (var i = Level - 2; i > -1; --i)
             {
                 for (var j = 0; j < quadrantsOfLevels[i].Count; ++j)
                 {
                     quadrantsOfLevels[i][j].OutgoingExpansions = DenseVector.OfArray(new double[CustomConstants.ErrorP]);
-
-                    if (quadrantsOfLevels[i][j].Points == null || !quadrantsOfLevels[i][j].Points.Any())
+                    if (quadrantsOfLevels[i][j]?.Points.Any() != true)
                     {
                         continue;
                     }
 
                     AssignListQuadrants(child, GetChildren(quadrantsOfLevels[i][j], quadrantsOfLevels[i + 1]));
-
                     foreach (var quad in child)
                     {
-                        if (quad.Points == null || !quad.Points.Any())
+                        if (quad.Points?.Any() != true)
                         {
                             continue;
                         }
@@ -157,13 +148,20 @@ namespace PFMM
                 {
                     quadrantsOfLevels[i][j].IncomingExpansions = DenseVector.OfArray(new double[CustomConstants.ErrorP]);
 
-                    if (quadrantsOfLevels[i][j].Points == null || !quadrantsOfLevels[i][j].Points.Any())
+                    if (quadrantsOfLevels[i][j].Points?.Any() != true)
                     {
                         continue;
                     }
 
                     AssignListQuadrants(temp, quadrantsOfLevels[i - 1]);
                     AssignListQuadrants(parentNearField, QuadrantDivider.NearField(quadrantsOfLevels[i][j].Parent, temp, i));
+
+                    var theSameQuad = parentNearField.FirstOrDefault(q =>
+                        Math.Abs(quadrantsOfLevels[i][j].Parent.AEnd - q.AEnd) < _eps
+                        && Math.Abs(quadrantsOfLevels[i][j].Parent.BEnd - q.BEnd) < _eps
+                        && Math.Abs(quadrantsOfLevels[i][j].Parent.BStart - q.BStart) < _eps
+                        && Math.Abs(quadrantsOfLevels[i][j].Parent.AStart - q.AStart) < _eps);
+                    parentNearField.Remove(theSameQuad);
 
                     childrenOfParentNeighbors.Clear();
                     foreach (var nearFild in parentNearField)
@@ -182,8 +180,8 @@ namespace PFMM
                         }
 
                         quadrantsOfLevels[i][j].IncomingExpansions += MultiplyMatrixOnVector(multEx.T_ifo(
-                            quad.CentreQuadrant(),
-                            quadrantsOfLevels[i][j].CentreQuadrant()), quad.OutgoingExpansions);
+                            quadrantsOfLevels[i][j].CentreQuadrant(),
+                            quad.CentreQuadrant()), quad.OutgoingExpansions);
                     }
                 }
             }
@@ -196,7 +194,7 @@ namespace PFMM
             {
                 for (var j = 0; j < quadrantsOfLevels[i].Count; ++j)
                 {
-                    if (quadrantsOfLevels[i][j].Points == null || !quadrantsOfLevels[i][j].Points.Any())
+                    if (quadrantsOfLevels[i][j].Points?.Any() != true)
                     {
                         continue;
                     }
@@ -221,7 +219,6 @@ namespace PFMM
                     continue;
                 }
 
-                AssignListQuadrants(temp, quadrantsOfLevels[Level - 1]);
                 var a = MultiplyMatrixOnVector(
                     multEx.T_tfi(quadrantsOfLevels[Level - 1][j].Points,
                         quadrantsOfLevels[Level - 1][j].CentreQuadrant()),
@@ -257,7 +254,7 @@ namespace PFMM
             var multEx = new MultipoleExpansion();
             for (var i = 0; i < quadrantsOfLevels[Level - 1].Count; i++)
             {
-                if (quadrantsOfLevels[Level - 1][i].Points == null || !quadrantsOfLevels[Level - 1][i].Points.Any())
+                if (quadrantsOfLevels[Level - 1][i].Points?.Any() != true)
                 {
                     continue;
                 }
@@ -272,41 +269,38 @@ namespace PFMM
 
             var interactionList = new List<Quadrant>();
             var temp = new List<Quadrant>();
-
-            for (var j = 0; j < quadrantsOfLevels[Level - 1].Count; ++j)
+            for (var i = 0; i < quadrantsOfLevels[Level - 1].Count; ++i)
             {
-                if (quadrantsOfLevels[Level - 1][j].Points == null || !quadrantsOfLevels[Level - 1][j].Points.Any())
+                if (quadrantsOfLevels[Level - 1][i].Points?.Any() != true)
                 {
                     continue;
                 }
 
                 AssignListQuadrants(temp, quadrantsOfLevels[Level - 1]);
-                AssignListQuadrants(interactionList, QuadrantDivider.FarField(quadrantsOfLevels[Level - 1][j], temp, Level));
+                AssignListQuadrants(interactionList, QuadrantDivider.FarField(quadrantsOfLevels[Level - 1][i], temp, Level));
 
-                quadrantsOfLevels[Level - 1][j].IncomingExpansions = DenseVector.OfArray(new double[CustomConstants.ErrorP]);
+                quadrantsOfLevels[Level - 1][i].IncomingExpansions = DenseVector.OfArray(new double[CustomConstants.ErrorP]);
                 foreach (var quad in interactionList)
                 {
-                    if (quad.Points == null || !quad.Points.Any())
+                    if (quad.Points?.Any() != true)
                     {
                         continue;
                     }
 
-                    quadrantsOfLevels[Level - 1][j].IncomingExpansions += MultiplyMatrixOnVector(multEx.T_ifo(
-                        quad.CentreQuadrant(),
-                        quadrantsOfLevels[Level - 1][j].CentreQuadrant()), quad.OutgoingExpansions);
+                    quadrantsOfLevels[Level - 1][i].IncomingExpansions += MultiplyMatrixOnVector(multEx.T_ifo(
+                        quadrantsOfLevels[Level - 1][i].CentreQuadrant(), quad.CentreQuadrant()), quad.OutgoingExpansions);
                 }
             }
 
             var nearList = new List<Quadrant>();
             for (var j = 0; j < quadrantsOfLevels[Level - 1].Count; ++j)
             {
-                if (quadrantsOfLevels[Level - 1][j].Points == null || !quadrantsOfLevels[Level - 1][j].Points.Any())
+                if (quadrantsOfLevels[Level - 1][j].Points?.Any() != true)
                 {
                     continue;
                 }
 
-                var a = MultiplyMatrixOnVector(
-                    multEx.T_tfi(quadrantsOfLevels[Level - 1][j].Points,
+                var a = MultiplyMatrixOnVector( multEx.T_tfi(quadrantsOfLevels[Level - 1][j].Points,
                         quadrantsOfLevels[Level - 1][j].CentreQuadrant()),
                     quadrantsOfLevels[Level - 1][j].IncomingExpansions);
 
@@ -316,7 +310,7 @@ namespace PFMM
 
                 foreach (var quad in nearList)
                 {
-                    if (quad.Points == null || !quad.Points.Any())
+                    if (quad.Points?.Any() != true)
                     {
                         continue;
                     }
@@ -336,15 +330,13 @@ namespace PFMM
         {
             var resultVector = new double[matrix.RowCount];
 
-            Parallel.For(0, matrix.RowCount, new ParallelOptions { MaxDegreeOfParallelism = 30 }, i =>
-              {
-                  for (int j = 0; j < matrix.ColumnCount; j++)
-                  {
-                      resultVector[i] += matrix[i, j] * vector[j];
-                  }
-
-              });
-
+            for (int i = 0; i < matrix.RowCount; i++)
+            {
+                for (int j = 0; j < matrix.ColumnCount; j++)
+                {
+                    resultVector[i] += matrix[i, j] * vector[j];
+                }
+            }
             return DenseVector.OfArray(resultVector);
         }
 
@@ -375,8 +367,7 @@ namespace PFMM
 
         private double NearInteraction(Point p1, Point p2)
         {
-            return -(1.0) * Math.Log(Math.Sqrt(Math.Pow(p1.X - p2.X, 2) +
-                                               Math.Pow(p1.Y - p2.Y, 2)));
+            return Math.Log(Math.Sqrt(Math.Pow((p1.X - p2.X), 2) + Math.Pow((p1.Y - p2.Y), 2)));
         }
 
         public void InitializeListQuadrants(List<Quadrant> partOfQuadrants, List<Quadrant> quadrants)
@@ -440,7 +431,11 @@ namespace PFMM
 
         private List<Quadrant> GetChildren(Quadrant parent, IEnumerable<Quadrant> quadrants)
         {
-            return quadrants.Where(quadrant => Math.Abs(quadrant.Parent.AEnd - parent.AEnd) < _eps && Math.Abs(quadrant.Parent.BEnd - parent.BEnd) < _eps && Math.Abs(quadrant.Parent.AStart - parent.AStart) < _eps && Math.Abs(quadrant.Parent.BStart - parent.BStart) < _eps).ToList();
+            var copyOfQuadrants = new List<Quadrant>(quadrants);
+            return copyOfQuadrants.Where(quadrant => Math.Abs(quadrant.Parent.AEnd - parent.AEnd) < _eps
+                                               && Math.Abs(quadrant.Parent.BEnd - parent.BEnd) < _eps 
+                                               && Math.Abs(quadrant.Parent.AStart - parent.AStart) < _eps
+                                               && Math.Abs(quadrant.Parent.BStart - parent.BStart) < _eps).ToList();
         }
     }
 }

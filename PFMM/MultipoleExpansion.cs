@@ -7,21 +7,21 @@ namespace PFMM
 {
     public class MultipoleExpansion
     {
-        private static double Distance(Point x, Point y)
+        private double Distance(Point x, Point y)
         {
             return Math.Sqrt(Math.Pow((x.X - y.X), 2) + Math.Pow((x.Y - y.Y), 2));
         }
 
-        public static double Factorial(int number)
+        public double Factorial(int number)
         {
-            if (number == 1 || number == 0)
+            if (number < 2)
                 return 1;
             return number * Factorial(number - 1);
         }
 
         private double Bcl(int n, int k)
         {
-            return Factorial(n) / (Factorial(k) * Factorial(n - k));
+            return (Factorial(n)) / (Factorial(k) * Factorial(n - k));
         }
 
         public Matrix<double> T_ofs(List<Point> points, Point c)
@@ -33,11 +33,11 @@ namespace PFMM
                 {
                     if (i == 0)
                     {
-                        tOfs[i, j] = -(1.0);
+                        tOfs[i, j] = (1.0);
                     }
                     else
                     {
-                        tOfs[i, j] = -(1.0) * -(1.0 / i) * Math.Pow(Distance(points[j], c), i);
+                        tOfs[i, j] = (-1.0 / i) * Math.Pow(Distance(points[j], c), i);
                     }
                 }
             }
@@ -56,7 +56,7 @@ namespace PFMM
                 }
                 else
                 {
-                    tIfo[i, 0] = -1.0 / (i * Math.Pow(Distance(c1, c2), i));
+                    tIfo[i, 0] = (-1.0 / (i * Math.Pow(Distance(c1, c2), i)));
                 }
 
                 for (var j = 1; j < CustomConstants.ErrorP; j++)
@@ -97,7 +97,7 @@ namespace PFMM
             {
                 if (i == 0)
                 {
-                    tOfo[i, 0] = 1.0;
+                    tOfo[0, 0] = 1.0;
                 }
                 else
                 {

@@ -36,15 +36,11 @@ namespace PFMM
             BEnd = SquarePoints.B2;
         }
 
-        public Quadrant(Quadrant p)
+        public Quadrant(Quadrant parent)
         {
             Points = new List<Point>();
             Parent = new Quadrant();
-            AssignQuadrant(p);
-            AStart = SquarePoints.A1;
-            AEnd = SquarePoints.A2;
-            BStart = SquarePoints.B1;
-            BEnd = SquarePoints.B2;
+            AssignQuadrant(parent);
         }
 
         public void AssignPoints(List<Point> p)
@@ -55,16 +51,16 @@ namespace PFMM
             }
         }
 
-        public void AssignQuadrant(Quadrant p)
+        public void AssignQuadrant(Quadrant parent)
         {
-            Parent.AEnd = p.AEnd;
-            Parent.BEnd = p.BEnd;
-            Parent.AStart = p.AStart;
-            Parent.BStart = p.BStart;
+            Parent.AEnd = parent.AEnd;
+            Parent.BEnd = parent.BEnd;
+            Parent.AStart = parent.AStart;
+            Parent.BStart = parent.BStart;
             Parent.Points = new List<Point>();
-            for (var i = 0; i < p.Points.Count; ++i)
+            for (var i = 0; i < parent.Points.Count; ++i)
             {
-                Parent.Points.Add(p.Points[i]);
+                Parent.Points.Add(parent.Points[i]);
             }
         }
 
