@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
 
@@ -9,7 +8,6 @@ namespace PFMM
 {
     public class FastMultipoleMethod
     {
-        private readonly double _eps = Math.Pow(10, -8);
         public int Level;
 
         public Dictionary<Point, double> MethodsMultLevel(List<Point> points)
@@ -157,10 +155,10 @@ namespace PFMM
                     AssignListQuadrants(parentNearField, QuadrantDivider.NearField(quadrantsOfLevels[i][j].Parent, temp, i));
 
                     var theSameQuad = parentNearField.FirstOrDefault(q =>
-                        Math.Abs(quadrantsOfLevels[i][j].Parent.AEnd - q.AEnd) < _eps
-                        && Math.Abs(quadrantsOfLevels[i][j].Parent.BEnd - q.BEnd) < _eps
-                        && Math.Abs(quadrantsOfLevels[i][j].Parent.BStart - q.BStart) < _eps
-                        && Math.Abs(quadrantsOfLevels[i][j].Parent.AStart - q.AStart) < _eps);
+                        Math.Abs(quadrantsOfLevels[i][j].Parent.AEnd - q.AEnd) < Double.Epsilon
+                        && Math.Abs(quadrantsOfLevels[i][j].Parent.BEnd - q.BEnd) < Double.Epsilon
+                        && Math.Abs(quadrantsOfLevels[i][j].Parent.BStart - q.BStart) < Double.Epsilon
+                        && Math.Abs(quadrantsOfLevels[i][j].Parent.AStart - q.AStart) < Double.Epsilon);
                     parentNearField.Remove(theSameQuad);
 
                     childrenOfParentNeighbors.Clear();
@@ -247,6 +245,39 @@ namespace PFMM
 
             Console.WriteLine(watch.ElapsedMilliseconds);
             watch.Stop();
+        }
+
+        public Dictionary<Point, double> SolveDirihleProblem(List<Point> pointsToSolve, List<Point> pointOnBounds)
+        {
+            var solveQuad = new Quadrant(pointsToSolve);
+            var boundsQuad = new Quadrant(pointOnBounds);
+            boundsQuad.AStart = -2 ;
+            boundsQuad.AEnd = 6;
+            boundsQuad.BStart = -4 ;
+            boundsQuad.BEnd = 4;
+
+            var multEx = new MultipoleExpansion();
+
+            var weight = new List<double>();
+            boundsQuad.Points.ForEach(p => { weight.Add(p.AdditionalValue); });
+
+            boundsQuad.OutgoingExpansions = MultiplyMatrixOnVector(multEx.T_ofs(boundsQuad.Points,
+                boundsQuad.CentreQuadrant()), DenseVector.OfArray(weight.ToArray()));
+
+            solveQuad.IncomingExpansions = MultiplyMatrixOnVector(multEx.T_ifo(
+                solveQuad.CentreQuadrant(), boundsQuad.CentreQuadrant()), boundsQuad.OutgoingExpansions);
+
+            solveQuad.Interaction = MultiplyMatrixOnVector(multEx.T_tfi(solveQuad.Points,
+                    solveQuad.CentreQuadrant()),
+                solveQuad.IncomingExpansions);
+
+            var dictionary = new Dictionary<Point, double>();
+            for (var j = 0; j < solveQuad.Points.Count; j++)
+            {
+                dictionary.Add(solveQuad.Points[j], solveQuad.Interaction[j]);
+            }
+
+            return dictionary;
         }
 
         private void SingleLevelInteraction(IReadOnlyList<List<Quadrant>> quadrantsOfLevels)
@@ -343,8 +374,8 @@ namespace PFMM
         private Quadrant GetParentQuad(Quadrant par, IEnumerable<Quadrant> quadrants)
         {
             return quadrants.FirstOrDefault(q =>
-                Math.Abs(q.AStart - par.AStart) < _eps && Math.Abs(q.AEnd - par.AEnd) < _eps &&
-                Math.Abs(q.BStart - par.BStart) < _eps && Math.Abs(q.BEnd - par.BEnd) < _eps);
+                Math.Abs(q.AStart - par.AStart) < Double.Epsilon && Math.Abs(q.AEnd - par.AEnd) < Double.Epsilon &&
+                Math.Abs(q.BStart - par.BStart) < Double.Epsilon && Math.Abs(q.BEnd - par.BEnd) < Double.Epsilon);
         }
 
         private Matrix<double> A(IReadOnlyList<Point> tauPoints, IReadOnlyList<Point> tPoints)
@@ -355,8 +386,8 @@ namespace PFMM
                 for (var j = 0; j < tPoints.Count; j++)
                 {
 
-                    a[i, j] = Math.Abs(tauPoints[i].X - tPoints[j].X) > _eps &&
-                              Math.Abs(tauPoints[i].Y - tPoints[j].Y) > _eps
+                    a[i, j] = Math.Abs(tauPoints[i].X - tPoints[j].X) > Double.Epsilon &&
+                              Math.Abs(tauPoints[i].Y - tPoints[j].Y) > Double.Epsilon
                         ? NearInteraction(tauPoints[i], tPoints[j])
                         : 0;
                 }
@@ -432,10 +463,10 @@ namespace PFMM
         private List<Quadrant> GetChildren(Quadrant parent, IEnumerable<Quadrant> quadrants)
         {
             var copyOfQuadrants = new List<Quadrant>(quadrants);
-            return copyOfQuadrants.Where(quadrant => Math.Abs(quadrant.Parent.AEnd - parent.AEnd) < _eps
-                                               && Math.Abs(quadrant.Parent.BEnd - parent.BEnd) < _eps 
-                                               && Math.Abs(quadrant.Parent.AStart - parent.AStart) < _eps
-                                               && Math.Abs(quadrant.Parent.BStart - parent.BStart) < _eps).ToList();
+            return copyOfQuadrants.Where(quadrant => Math.Abs(quadrant.Parent.AEnd - parent.AEnd) < Double.Epsilon
+                                               && Math.Abs(quadrant.Parent.BEnd - parent.BEnd) < Double.Epsilon
+                                               && Math.Abs(quadrant.Parent.AStart - parent.AStart) < Double.Epsilon
+                                               && Math.Abs(quadrant.Parent.BStart - parent.BStart) < Double.Epsilon).ToList();
         }
     }
 }

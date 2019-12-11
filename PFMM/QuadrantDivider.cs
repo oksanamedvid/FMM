@@ -8,8 +8,6 @@ namespace PFMM
         public static double HA = Math.Abs((SquarePoints.A2 - SquarePoints.A1));
         public static double HB = Math.Abs((SquarePoints.B2 - SquarePoints.B1));
 
-        private static readonly double Eps = Math.Pow(10, -8);
-
         public static void CreateQuadrants(Quadrant parent)
         {
             Quadrants.Clear();
@@ -71,10 +69,10 @@ namespace PFMM
 
             foreach (var quadrant in quadrantsOfLevel)
             {
-                if ((Math.Abs(Math.Abs(quad.AStart - quadrant.AStart) - (tempA)) < Eps ||
-                     (Math.Abs(Math.Abs(quad.AStart - quadrant.AStart)) < Eps)) &&
-                    ((Math.Abs(Math.Abs(quad.BStart - quadrant.BStart) - (tempB)) < Eps) ||
-                     (Math.Abs(Math.Abs(quad.BStart - quadrant.BStart)) < Eps)))
+                if ((Math.Abs(Math.Abs(quad.AStart - quadrant.AStart) - (tempA)) < Double.Epsilon ||
+                     (Math.Abs(Math.Abs(quad.AStart - quadrant.AStart)) < Double.Epsilon)) &&
+                    ((Math.Abs(Math.Abs(quad.BStart - quadrant.BStart) - (tempB)) < Double.Epsilon) ||
+                     (Math.Abs(Math.Abs(quad.BStart - quadrant.BStart)) < Double.Epsilon)))
                 {
                     nearField.Add(quadrant);
                 }
